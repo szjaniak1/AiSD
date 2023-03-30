@@ -29,21 +29,23 @@ void printArray(int *tab, int size)
 	printf("%c", '\n');
 }
 
-int* takeInput(int argc, char *argv[])
+int* takeInput(int argc)
 {	
-	int *tab = malloc((argc - 2) * sizeof(int));
-	for (int i = 2; i < argc; i++)
-	{
-		*(tab + i - 2) = atoi(argv[i]);
+	int arg;
+	int *tab = malloc((argc) * sizeof(int));
+	for (int i = 0; i < argc; i++)
+	{	
+		scanf("%d", &arg);
+		*(tab + i) = arg;
 	}
 	return tab;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-	int *arr = takeInput(argc, argv);;
-	int size = atoi(argv[1]);
-	
+	int size;
+       	scanf("%d", &size);	
+	int *arr = takeInput(size);;
 	printArray(arr, size);
 	insertionSort(arr, size);
 	printArray(arr, size);
