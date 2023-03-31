@@ -7,8 +7,6 @@ static int numberOfComparisons = 0;
 static int numberOfShifts = 0;
 static int size = 0;
 
-void printArray(int *tab, int size);
-
 bool isOk(int num1, int num2)
 {
 	numberOfComparisons++;
@@ -84,33 +82,7 @@ void mergeSort(int *tab, int left, int right)
 		mergeSort(tab, mid + 1, right);
 		
 		merge(tab, left, mid, right);
-		
-		if (size < 40)
-		{
-			printArray(tab, size);
-		}
 	}
-}
-
-void printArray(int *tab, int size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		printf("%02d ", *(tab + i));
-	}
-	printf("%c", '\n');
-}
-
-bool isSorted(int *tab, int size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		if (*(tab + i - 1) > *(tab + i))
-		{
-			return false;
-		}
-	}
-	return true;
 }
 
 int* takeInput(int argc)
@@ -130,24 +102,9 @@ int main()
        	scanf("%d", &size);	
 	int *arr = takeInput(size);
 	
-	if (size < 40)
-	{
-		printArray(arr, size);
-	}
-
 	mergeSort(arr, 0, size - 1);
 
-	printf("\ntotal number of comparisons: %d, total number of shifts: %d\n", numberOfComparisons,
-			numberOfShifts);
-
-	if (isSorted(arr, size))
-	{
-		printf("array is sorted!");
-	}
-	else
-	{
-		printf("array is NOT sorted!");
-	}
+	printf("%d %d\n", numberOfComparisons,numberOfShifts);
 
 	return 0;
 }
