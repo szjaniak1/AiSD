@@ -67,7 +67,7 @@ int main()
 
 	insertionSort(arr, size);
 	
-	printf("%d %d\n", numberOfComparisons, numberOfShifts);
+	printf("%d;%d", numberOfComparisons, numberOfShifts);
 	
 	return 0;
 }

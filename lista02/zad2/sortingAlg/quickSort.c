@@ -74,7 +74,7 @@ int main()
 
 	quickSort(arr, 0, size - 1);
 
-	printf("%d %d\n", numberOfComparisons, numberOfShifts);
+	printf("%d;%d", numberOfComparisons, numberOfShifts);
 
 	return 0;
 }
