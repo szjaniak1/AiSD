@@ -1,7 +1,7 @@
 #!/usr/sbin/zsh
 
 rm ./data/sortingAlgResults.csv
-declare -a algorithms=("./sortingAlg/qS.o" "./sortingAlg/mS.o" "./sortingAlg/iS.o")
+declare -a algorithms=("./sortingAlg/qS.o" "./sortingAlg/mS.o" "./sortingAlg/iS.o" "./sortingAlg/dPQS.o" "./sortingAlg/cS.o")
 datafile="./data/sortingAlgResults.csv"
 
 for n in {10..200..10}
