@@ -41,10 +41,10 @@ bool shift(int j, int i, int *tab, int key)
 	return true;
 }
 
-void insertionSort(int *tab, int size)
+void insertionSort(int *tab, int start, int end)
 {
 	int i, j, key;
-	for (i = 1; i < size; i++)
+	for (i = start; i < end; i++)
 	{
 		key = tab[i];
 		j = i - 1;
@@ -114,9 +114,9 @@ void merge(int *arr, int left, int mid, int right)
 
 void mergeSort(int *tab, int left, int right)
 {
-	if (right - left <= 4)
+	if (right - left <= 8)
 	{
-		insertionSort(tab, size);
+		insertionSort(tab, left, right);
 	}
 	else if (left < right)
 	{
