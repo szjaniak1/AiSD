@@ -12,7 +12,17 @@ void printArray(int *tab, int size);
 bool isOk(int num1, int num2)
 {	
 	numberOfComparisons++;
-	if (num1 <= num2)
+	if (num1 < num2)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool isOk2(int num1, int num2)
+{	
+	numberOfComparisons++;
+	if (num1 >= num2)
 	{
 		return true;
 	}
@@ -28,6 +38,7 @@ void swap(int *n1, int *n2)
 
 int partition(int *tab, int low, int high, int *lp)
 {
+	numberOfComparisons++;
 	if (tab[low] > tab[high])
 	{
 		swap(&tab[low], &tab[high]);
@@ -35,19 +46,19 @@ int partition(int *tab, int low, int high, int *lp)
 	}
 
 	int j = low + 1;
-	int g = high - 1, k = low + 1; p = tab[low], q = tab[high];
+	int g = high - 1, k = low + 1, p = tab[low], q = tab[high];
 
 	while (k <= g) 
 	{
-		if (tab[k] < p)
+		if (isOk(tab[k], p))
 		{
 			swap(&tab[k], &tab[j]);
 			numberOfShifts++;
 			j++;
 		}
-		else if (tab[k] >= q)
+		else if (isOk2(tab[k], q))
 		{
-			while (tab[g] > q && k < g)
+			while (isOk(q, tab[g]) && k < g)
 			{
 				g--;
 			}
@@ -56,7 +67,7 @@ int partition(int *tab, int low, int high, int *lp)
 			numberOfShifts++;
 			g--;
 
-			if (tab[k] < p)
+			if (isOk(tab[k], p))
 			{
 				swap(&tab[k], &tab[j]);
 				numberOfShifts++;
@@ -85,7 +96,7 @@ void dualPivotQuickSort(int *tab, int low, int high)
 	       	rp = partition(tab, low, high, &lp);
 
 		dualPivotQuickSort(tab, low, lp - 1);
-		dualPivotQuickSort(tab, li + 1, rp - 1);
+		dualPivotQuickSort(tab, lp + 1, rp - 1);
 		dualPivotQuickSort(tab, rp + 1, high);
 
 		if (size < 40)
@@ -138,7 +149,7 @@ int main()
 		printArray(arr, size);
 	}
 
-	quickSort(arr, 0, size - 1);
+	dualPivotQuickSort(arr, 0, size - 1);
 
 	printf("\ntotal number of comparisons: %d, total number of shifts: %d\n", numberOfComparisons, numberOfShifts);
 
