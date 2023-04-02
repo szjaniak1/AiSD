@@ -1,2 +1,10 @@
 ./svn
 ./.gitignore
+./lista02/zad1/generators/rNG.o
+./lista02/zad1/generators/dNG.o
+./lista02/zad1/generators/aNG.o
+./lista02/zad1/sortingAlg/qS.o
+./lista02/zad1/sortingAlg/mS.o
+./lista02/zad1/sortingAlg/iS.o
+./lista02/zad1/sortingAlg/cS.o
+./lista02/zad1/sortingAlg/dPQS.o
