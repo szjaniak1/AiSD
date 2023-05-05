@@ -125,7 +125,7 @@ int main(void)
 	arr = takeInput();
 	memcpy(temp_arr, arr, sizeof(uint64_t) * size);
 
-	printArray(arr);
+	if (size <= 50) printArray(arr);
 	const uint64_t rselect = randomized_select(arr, 0, size - 1, 11);
 	
 	printf("rselect: %ld, total number of comparisons: %ld, total number of swaps: %ld\n", rselect, number_of_comparisons, number_of_swaps);
@@ -136,7 +136,7 @@ int main(void)
 
 	printf("qselect: %ld, total number of comparisons: %ld, total number of swaps: %ld\n", qselect, number_of_comparisons, number_of_swaps);
 
-	printArray(arr);
+	if (size <= 50) printArray(arr);
 
 	return 0;
 }
