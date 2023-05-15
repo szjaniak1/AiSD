@@ -1,4 +1,4 @@
-type;n;comp;shifts
+type;n;k;comp;swaps
 rselect: 19, total number of comparisons: 78, total number of swaps: 94
 qselect: 19, total number of comparisons: 0, total number of swaps: 0
 rselect: 20, total number of comparisons: 106, total number of swaps: 112
