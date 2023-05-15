@@ -3,6 +3,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include <time.h>
+#include <stdbool.h>
 
 static uint64_t number_of_comparisons = 0;
 static uint64_t number_of_swaps = 0;
@@ -13,9 +14,12 @@ uint64_t* takeInput(void);
 size_t select_pivot(uint64_t arr[], const size_t left, const size_t right, const size_t part_size);
 size_t select_partition(uint64_t arr[], const size_t left, const size_t right, const size_t pivot_index, const size_t n);
 size_t partition5(uint64_t arr[], const size_t p, const size_t r);
+size_t partition(uint64_t arr[], size_t low, size_t high);
 size_t rand_partition(uint64_t arr[], const size_t p, const size_t r);
 uint64_t randomized_select(uint64_t arr[], const size_t p, const size_t r, const size_t i);
 uint64_t qselect(uint64_t arr[], const size_t left, const size_t right, const size_t n, const size_t part_size);
+void quicksort_select(uint64_t arr[], size_t low, size_t high);
+void dp_quicksort_select(uint64_t arr[], size_t left, size_t right);
 void swap(uint64_t arr[], const size_t p, const size_t r);
 int cmp(const void *a, const void *b);
 
@@ -61,6 +65,7 @@ size_t select_partition(uint64_t arr[], const size_t left, const size_t right, c
 
 	for (size_t i = left; i < right; i++)
 	{
+		number_of_comparisons++; 
 		if (arr[i] < pivot_value)
 		{
 			swap(arr, store_index, i);
@@ -71,6 +76,7 @@ size_t select_partition(uint64_t arr[], const size_t left, const size_t right, c
 	size_t store_index_eq = store_index;
 	for (size_t i = store_index; i < right; i++)
 	{
+		number_of_comparisons++;
 		if (arr[i] == pivot_value)
 		{
 			swap(arr, store_index_eq, i);
@@ -103,6 +109,35 @@ size_t partition5(uint64_t arr[], const size_t left, const size_t right)
 	}
 
 	return (left + right) / 2;
+}
+
+size_t partition(uint64_t arr[], size_t low, size_t high)
+{
+	size_t pivot = select_pivot(arr, low, high, 5);
+	uint64_t pivot_value = arr[pivot];
+	size_t left_index = low - 1;
+	size_t right_index = high + 1;
+
+	while(true)
+	{
+		while(true)
+		{
+			left_index++;
+			number_of_comparisons++;
+			if (arr[left_index] >= pivot_value) break;
+		}
+
+		while (true)
+		{
+			right_index--;
+			number_of_comparisons++;
+			if (arr[left_index] >= pivot_value) break;
+		}
+
+		if (left_index >= right_index) return right_index;
+
+		swap(arr, left_index, right_index);
+	}
 }
 
 uint64_t randomized_select(uint64_t arr[], const size_t p, const size_t r, const size_t i)
@@ -148,6 +183,233 @@ uint64_t qselect(uint64_t arr[], const size_t left, const size_t right, const si
 	return qselect(arr, pivot_index + 1, right, n, part_size);	
 }
 
+void quicksort_select(uint64_t arr[], size_t low, size_t high)
+{
+	if (low < high)
+	{
+		size_t p = partition(arr, low, high);
+		quicksort_select(arr, low, p);
+		quicksort_select(arr, p + 1, high);
+	}
+}
+
+void dp_quicksort_select(uint64_t arr[], size_t left, size_t right)
+{
+	if (left < right)
+	{
+		size_t mid = (left + right) / 2;
+		size_t p_idx = select_pivot(arr, left, mid, 5);
+		size_t q_idx = select_pivot(arr, mid + 1, right, 5);
+
+		swap(arr, left, p_idx);
+		swap(arr, right, q_idx);\
+
+		uint64_t p;
+		uint64_t q;
+
+		number_of_comparisons++;
+		if (arr[right] < arr[left])
+		{
+			p = arr[right];
+			q = arr[left];			
+		}
+		else
+		{
+			q = arr[right];
+			p = arr[left];
+		}
+
+		int32_t i = left + 1;
+		int32_t k = right - 1;
+		int32_t j = i;
+		int32_t d = 0;
+
+		while(j <= k)
+		{
+			number_of_comparisons++;
+			if (d >= 0)
+			{
+				number_of_comparisons++;
+				if (arr[j] < p)
+				{
+					swap(arr, i, j);
+					i++;
+					j++;
+					d++;
+				}
+				else if (arr[j] < q)
+				{	
+					number_of_comparisons++;
+					j++;
+				}
+				else
+				{
+					number_of_comparisons++;	
+					swap(arr, j, k);
+					k--;
+					d--;
+				}
+			}
+			else if (arr[k] > q)
+			{
+				number_of_comparisons++;
+				k--;
+				d--;
+			}
+			else
+			{
+				number_of_comparisons++;
+				if (arr[k] < p)
+				{
+					number_of_swaps++;
+					uint64_t tmp = arr[k];
+					arr[k] = arr[j];
+					arr[j] = arr[i];
+					arr[i] = tmp;
+					i++;
+					d++;
+				}
+				else
+				{
+					swap(arr, j, k);
+				}
+				j++;
+			}
+		}
+
+		arr[left] = arr[i - 1];
+		arr[i - 1] = p;
+		arr[right] = arr[k + 1];
+		arr[k + 1] = q;
+
+		if (i - 2 >= 0)
+		{
+			dp_quicksort_select(arr, left, i - 2);
+		}
+		dp_quicksort_select(arr, i, k);
+		dp_quicksort_select(arr, k + 2, right);
+	}
+}
+
+void dual_pivot_quicksort(uint64_t arr[], size_t left, size_t right)
+{
+if (left < right)
+	{
+		uint64_t p;
+		uint64_t q;
+
+		number_of_comparisons++;
+		if (arr[right] < arr[left])
+		{
+			swap(arr, right, left);
+		}
+
+		int32_t i = left + 1;
+		int32_t k = right - 1;
+		int32_t j = i;
+		int32_t d = 0;
+
+		while(j <= k)
+		{
+			number_of_comparisons++;
+			if (d >= 0)
+			{
+				number_of_comparisons++;
+				if (arr[j] < p)
+				{
+					swap(arr, i, j);
+					i++;
+					j++;
+					d++;
+				}
+				else if (arr[j] < q)
+				{	
+					number_of_comparisons++;
+					j++;
+				}
+				else
+				{
+					number_of_comparisons++;	
+					swap(arr, j, k);
+					k--;
+					d--;
+				}
+			}
+			else if (arr[k] > q)
+			{
+				number_of_comparisons++;
+				k--;
+				d--;
+			}
+			else
+			{
+				number_of_comparisons++;
+				if (arr[k] < p)
+				{
+					number_of_swaps++;
+					uint64_t tmp = arr[k];
+					arr[k] = arr[j];
+					arr[j] = arr[i];
+					arr[i] = tmp;
+					i++;
+					d++;
+				}
+				else
+				{
+					swap(arr, j, k);
+				}
+				j++;
+			}
+		}
+
+		swap(arr, left, i - 1);
+		swap(arr, right, k + 1);
+
+		if (i - 2 >= 0)
+		{
+			dp_quicksort_select(arr, left, i - 2);
+		}
+		dual_pivot_quicksort(arr, i, k);
+		dual_pivot_quicksort(arr, k + 2, right);
+	}
+
+}
+
+qs_partition(uint64_t arr[], size_t low, size_t high)
+{
+	size_t pivot = arr[((high - low) / 2) + low];
+	size_t left_index = low - 1;
+	size_t right_index = high + 1;
+	while(true)
+	{
+		while(true)
+		{
+			left_index++;
+			number_of_comparisons++;
+			if (arr[left_index] >= pivot) break;
+		}
+
+		while(true)
+		{
+			right_index--;
+			if (arr[right_index] <= pivot) break;
+		}
+
+		if (left_index >= right_index) return right_index;
+		swap(arr, left_index, right_index);
+	}
+}
+
+void quick_sort(uint64_t arr[], size_t low, size_t high)
+{
+	if (low < high)
+	{
+		size_t p = qs_partition(arr, low, high);
+		quick_sort(arr, low, p);
+		quick_sort(arr, p + 1, high);
+	}
+}
+
 void printArray(const uint64_t arr[restrict])
 {
 	for (size_t i = 0; i < size; i++)
@@ -173,7 +435,8 @@ int main(int argc, char* argv[])
 	scanf("%zu", &size);
 	uint64_t *arr;
 	time_t t;
-	uint32_t stat = atoi(argv[2]);
+	size_t stat;
+	size_t part_size; 
 
 	srand((unsigned) time(&t));
 	arr = takeInput();
@@ -181,16 +444,34 @@ int main(int argc, char* argv[])
 	const uint8_t operation = atoi(argv[1]);
 	// 1 - rand select
 	// 2 - select (part5)
-	// 3 - select with custom part size	
+	// 3 - quicksort_select
+	// 4 - dp_quicksort_select
+	// 5 - dual_pivot_quicksort
+	// 6 - quicksort
+
 	uint64_t index;
 	switch (operation)
 	{
 		case 1:
+			stat = atoi(argv[2]);
 			index = randomized_select(arr, 0, size - 1, stat);
 			break;
 		case 2:
-			const size_t size = atoi(argv[3]);
-			index = qselect(arr, 0, size - 1, stat, size);
+			stat = atoi(argv[2]);
+			part_size = atoi(argv[3]);
+			index = qselect(arr, 0, size - 1, stat, part_size);
+			break;
+		case 3:
+			quicksort_select(arr, 0, size - 1);
+			break;
+		case 4:
+			dp_quicksort_select(arr, 0, size - 1);
+			break;
+		case 5:
+			dual_pivot_quicksort(arr, 0, size - 1);
+			break;
+		case 6:
+			quick_sort(arr, 0, size - 1);
 			break;
 	}
 

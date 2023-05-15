@@ -42,14 +42,39 @@ for n in {1000..100000..1000}
 do
 	for m in {0..1000}
 	do
-		echo "3;$n;" >> $datafile
+		echo "3;$n;$(./rNG.o $n | ./zad4.out 3)" >> $datafile
 	done
 
 	for m in {0..1000}
 	do
-		echo "$($n/12);$n;comp;" >> $datafile
+		echo "$($n/12);$n;$(./rNG.o $n | ./zad4.out $n/12)" >> $datafile
 	done
 
+	for m in {0..1000}
+	do
+		echo "$($n*7/12);$n;$(./rNG.o $n | ./zad4.out $n*7/12)" >> $datafile
+	done
 
+	for m in {0..1000}
+	do
+		echo "$($n*11/12);$n;$(./rNG.o $n | ./zad4.out $n*11/12)" >> $datafile
+	done
+
+	for m in {0..1000}
+	do
+		echo "$($n-4);$n;$(./rNG.o $n | ./zad4.out $n-4)" >> $datafile
+	done
+done
+
+#binary search with random number;
+declare datafile=./data/bin_search_data2.csv
+rm $datafile
+echo "n;comp;time;" >> $datafile
+for n in {100..1000..100}
+do
+	for m in {1..1000}
+	do
+		echo "$n;$(./rNG.o $n | ./zad4.out $(($RANDOM % $n)))" >> $datafile
+	done
 done
 

@@ -52,11 +52,11 @@ uint32_t* take_input(void)
 
 void find(const uint32_t arr[restrict], const uint32_t number)
 {	
-	double time = get_time();
+	int time = get_time();
 	uint8_t result = binary_search(arr, 0, size - 1, number);
 	time = get_time() - time;
-	if (result) printf("number %d is found in %d comparisons, in %.10lf seconds\n", number, number_of_comparisons, time);
-	else printf("number %d is not found in %d comparisons and in %.10lf seconds\n", number, number_of_comparisons, time);	
+	if (result) printf("%d;%d", number_of_comparisons, time);
+	else printf("%d;%d", number_of_comparisons, time);	
 }
 
 int cmp(const void *a, const void *b)
@@ -64,26 +64,15 @@ int cmp(const void *a, const void *b)
 	return (*(int*)a - *(int*)b);
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	time_t t;
 	srand((unsigned) time(&t));
 
 	scanf("%zu", &size);
-	uint32_t *arr = take_input();;
-	const size_t begin_number_index = size / 20;
-	const size_t end_number_index = size - begin_number_index;
-	const size_t mid_number_index = size / 2;
-	const size_t random_number_index = (size_t)rand() % size;
-	const uint32_t out_number = (uint32_t)(2 * size + 2);
-	
-	qsort(arr, size, sizeof(uint32_t), cmp);
-	if (size <= 50) print_array(arr);
-	find(arr, arr[begin_number_index]);
-	find(arr, arr[end_number_index]);
-       	find(arr, arr[mid_number_index]);
-	find(arr, arr[random_number_index]);
-	find(arr, out_number);
+	uint32_t *arr = take_input();
+	const size_t index = atoi(argv[1]);
 
+	find(arr, arr[index]);
 	return 0;
 }
