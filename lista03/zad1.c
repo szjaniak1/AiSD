@@ -10,15 +10,14 @@ static size_t size = 0;
 
 void printArray(const uint64_t arr[restrict]);
 uint64_t* takeInput(void);
-size_t pivot(uint64_t arr[], const size_t p, const size_t r);
-size_t partition(uint64_t arr[], const size_t p, const size_t r, const size_t index, const size_t n);
+size_t select_pivot(uint64_t arr[], const size_t left, const size_t right, const size_t part_size);
+size_t select_partition(uint64_t arr[], const size_t left, const size_t right, const size_t pivot_index, const size_t n);
 size_t partition5(uint64_t arr[], const size_t p, const size_t r);
 size_t rand_partition(uint64_t arr[], const size_t p, const size_t r);
 uint64_t randomized_select(uint64_t arr[], const size_t p, const size_t r, const size_t i);
-uint64_t quick_select(uint64_t arr[], const size_t p, const size_t r, const size_t i);
+uint64_t qselect(uint64_t arr[], const size_t left, const size_t right, const size_t n, const size_t part_size);
 void swap(uint64_t arr[], const size_t p, const size_t r);
 int cmp(const void *a, const void *b);
-void reload_counters(void);
 
 int cmp(const void *a, const void *b)
 {
@@ -54,13 +53,13 @@ size_t rand_partition(uint64_t arr[], const size_t p, const size_t r)
 	return i + 1;
 }
 
-size_t partition(uint64_t arr[], const size_t p, const size_t r, const size_t index, const size_t n)
+size_t select_partition(uint64_t arr[], const size_t left, const size_t right, const size_t pivot_index, const size_t n)
 {
-	uint64_t pivot_value = arr[index];
-	swap(arr, index, r);
-	size_t store_index = p;
+	uint64_t pivot_value = arr[pivot_index];
+	swap(arr, pivot_index, right);
+	size_t store_index = left;
 
-	for (size_t i = p; i <= r - 1; i++)
+	for (size_t i = left; i < right; i++)
 	{
 		if (arr[i] < pivot_value)
 		{
@@ -70,7 +69,7 @@ size_t partition(uint64_t arr[], const size_t p, const size_t r, const size_t in
 	}
 
 	size_t store_index_eq = store_index;
-	for (size_t i = store_index; i <= r - 1; i++)
+	for (size_t i = store_index; i < right; i++)
 	{
 		if (arr[i] == pivot_value)
 		{
@@ -79,30 +78,31 @@ size_t partition(uint64_t arr[], const size_t p, const size_t r, const size_t in
 		}
 	}
 
-	swap(arr, r, store_index_eq);
+	swap(arr, right, store_index_eq);
 
 	if (n < store_index) return store_index;
 	if (n <= store_index_eq) return n;
 	return store_index_eq;
 }
 
-size_t partition5(uint64_t arr[], const size_t p, const size_t r)
+size_t partition5(uint64_t arr[], const size_t left, const size_t right)
 {
 	size_t j;
-	size_t i = p + 1;
+	size_t i = left + 1;
 
-	while (i <= r)
+	while (i <= right)
 	{
 		j = i;
-		while (j > p && arr[j - 1] > arr[j])
+		while (j > left && arr[j - 1] > arr[j])
 		{
+			number_of_comparisons++;
 			swap(arr, j - 1, j);
 			j--;
 		}
 		i++;
 	}
 
-	return (p + r) / 2;
+	return (left + right) / 2;
 }
 
 uint64_t randomized_select(uint64_t arr[], const size_t p, const size_t r, const size_t i)
@@ -119,35 +119,33 @@ uint64_t randomized_select(uint64_t arr[], const size_t p, const size_t r, const
 	return randomized_select(arr, index + 1, r, i - k);
 }
 
-size_t pivot(uint64_t arr[], const size_t p, const size_t r, const size_t part_size)
+size_t select_pivot(uint64_t arr[], const size_t left, const size_t right, const size_t part_size)
 {
-	if (r - p < 5) return partition5(arr, p, r);
+	if (right - left < part_size) return partition5(arr, left, right);
 
-	for (size_t i = p; i <= r; i += part_size)
+	for (size_t i = left; i < right; i += part_size)
 	{
-		size_t sub_r = i + (part_size - 1);
-		if (sub_r > r) sub_r = r;
+		size_t sub_right = i + part_size - 1;
+		if (sub_right > right) sub_right = right;
 
-		size_t median5 = partition5(arr, i, sub_r);
-		swap(arr, median5, p + ((i - p) / part_size));
+		size_t median5 = partition5(arr, i, sub_right);
+		swap(arr, median5, left + ((i - left) / part_size));
 	}
 
-	size_t mid = ((r - p) / 10) + p + 1;
-	return quick_select(arr, p, p + ((r - p) / part_size), mid);
+	size_t mid = ((right - left) / (part_size*2)) + left + 1;
+	return qselect(arr, left, left + ((right - left) / part_size), mid, part_size);
 }
 
-uint64_t quick_select(uint64_t arr[], const size_t p, const size_t r, const size_t i)
+uint64_t qselect(uint64_t arr[], const size_t left, const size_t right, const size_t n, const size_t part_size)
 {
-	if (p == r) return arr[p];
+	if (left == right) return left;
 
-	size_t index = pivot(arr, p, r);
-	index = partition(arr, p, r, index, i);
+	size_t pivot_index = select_pivot(arr, left, right, part_size);
+	pivot_index = select_partition(arr, left, right, pivot_index, n);
 
-	if (size <= 50) printf("left range: %zu, right range: %zu, partition: %zu, found number: %02ld\n", p, r, i, arr[index]);
-
-	if (i == index) return arr[index];
-	if (i < index) return quick_select(arr, p, index - 1, i);
-	return quick_select(arr, index + 1, r, i);	
+	if (n == pivot_index) return n;
+	if (n < pivot_index) return qselect(arr, left, pivot_index - 1, n, part_size);
+	return qselect(arr, pivot_index + 1, right, n, part_size);	
 }
 
 void printArray(const uint64_t arr[restrict])
@@ -170,36 +168,32 @@ uint64_t* takeInput(void)
 	return arr;
 }
 
-void reload_counters(void)
-{
-	number_of_swaps = 0;
-	number_of_comparisons = 0;
-}
-
-int main(void)
+int main(int argc, char* argv[])
 {
 	scanf("%zu", &size);
 	uint64_t *arr;
-	uint64_t *temp_arr = malloc(size * sizeof(uint64_t));
 	time_t t;
-	uint64_t number_to_find = 5;
+	uint32_t stat = atoi(argv[2]);
 
 	srand((unsigned) time(&t));
 	arr = takeInput();
-	memcpy(temp_arr, arr, sizeof(uint64_t) * size);
-
-	if (size <= 50) printArray(arr);
-	const uint64_t rselect = randomized_select(arr, 0, size - 1, number_to_find);
 	
-	printf("rselect: %ld, total number of comparisons: %ld, total number of swaps: %ld\n", rselect, number_of_comparisons, number_of_swaps);
-	qsort(arr, size, sizeof(uint64_t), cmp);
-	reload_counters();
+	const uint8_t operation = atoi(argv[1]);
+	// 1 - rand select
+	// 2 - select (part5)
+	// 3 - select with custom part size	
+	uint64_t index;
+	switch (operation)
+	{
+		case 1:
+			index = randomized_select(arr, 0, size - 1, stat);
+			break;
+		case 2:
+			const size_t size = atoi(argv[3]);
+			index = qselect(arr, 0, size - 1, stat, size);
+			break;
+	}
 
-	const uint64_t qselect = quick_select(temp_arr, 0, size - 1, number_to_find);
-
-	printf("qselect: %ld, total number of comparisons: %ld, total number of swaps: %ld\n", qselect, number_of_comparisons, number_of_swaps);
-
-	if (size <= 50) printArray(arr);
-
+	printf("%ld;%ld", number_of_comparisons, number_of_swaps);
 	return 0;
 }
