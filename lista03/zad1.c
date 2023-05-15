@@ -119,21 +119,21 @@ uint64_t randomized_select(uint64_t arr[], const size_t p, const size_t r, const
 	return randomized_select(arr, index + 1, r, i - k);
 }
 
-size_t pivot(uint64_t arr[], const size_t p, const size_t r)
+size_t pivot(uint64_t arr[], const size_t p, const size_t r, const size_t part_size)
 {
 	if (r - p < 5) return partition5(arr, p, r);
 
-	for (size_t i = p; i <= r; i += 5)
+	for (size_t i = p; i <= r; i += part_size)
 	{
-		size_t sub_r = i + 4;
+		size_t sub_r = i + (part_size - 1);
 		if (sub_r > r) sub_r = r;
 
 		size_t median5 = partition5(arr, i, sub_r);
-		swap(arr, median5, p + ((i - p) / 5));
+		swap(arr, median5, p + ((i - p) / part_size));
 	}
 
 	size_t mid = ((r - p) / 10) + p + 1;
-	return quick_select(arr, p, p + ((r - p) / 5), mid);
+	return quick_select(arr, p, p + ((r - p) / part_size), mid);
 }
 
 uint64_t quick_select(uint64_t arr[], const size_t p, const size_t r, const size_t i)
