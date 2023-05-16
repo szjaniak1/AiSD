@@ -131,7 +131,7 @@ size_t partition(uint64_t arr[], size_t low, size_t high)
 		{
 			right_index--;
 			number_of_comparisons++;
-			if (arr[left_index] >= pivot_value) break;
+			if (arr[right_index] <= pivot_value) break;
 		}
 
 		if (left_index >= right_index) return right_index;
@@ -293,87 +293,63 @@ void dp_quicksort_select(uint64_t arr[], size_t left, size_t right)
 
 void dual_pivot_quicksort(uint64_t arr[], size_t left, size_t right)
 {
-if (left < right)
+	if (left < right)
 	{
-		uint64_t p;
-		uint64_t q;
+		size_t lp, rp;
+		rp = dp_partition(arr, left, right, &lp);
+		dual_pivot_quicksort(arr, left, lp - 1);
+		dual_pivot_quicksort(arr, lp + 1, rp - 1);
+		dual_pivot_quicksort(arr, rp + 1, right);
+	}
+}
 
+int dp_partition(uint64_t arr[], size_t low, size_t high, size_t* lp)
+{
+	if (arr[low] > arr[high])
+	{
+		swap(arr, low, high);
+	}
+
+	int j = low + 1;
+	int g = high - 1, k = low + 1;
+	int p = arr[low], q = arr[high];
+
+	while (k <= g)
+	{	
 		number_of_comparisons++;
-		if (arr[right] < arr[left])
+		if (arr[k] < p)
 		{
-			swap(arr, right, left);
+			swap(arr, k, j);
+			j++;
 		}
-
-		int32_t i = left + 1;
-		int32_t k = right - 1;
-		int32_t j = i;
-		int32_t d = 0;
-
-		while(j <= k)
+		else if (arr[k] >= q)
 		{
+			while (arr[g] > q && k < g)
+			{
+				number_of_comparisons++;
+				g--;
+			}
+			swap(arr, k, g);
+			g--;
 			number_of_comparisons++;
-			if (d >= 0)
+			if (arr[k] < p)
 			{
-				number_of_comparisons++;
-				if (arr[j] < p)
-				{
-					swap(arr, i, j);
-					i++;
-					j++;
-					d++;
-				}
-				else if (arr[j] < q)
-				{	
-					number_of_comparisons++;
-					j++;
-				}
-				else
-				{
-					number_of_comparisons++;	
-					swap(arr, j, k);
-					k--;
-					d--;
-				}
-			}
-			else if (arr[k] > q)
-			{
-				number_of_comparisons++;
-				k--;
-				d--;
-			}
-			else
-			{
-				number_of_comparisons++;
-				if (arr[k] < p)
-				{
-					number_of_swaps++;
-					uint64_t tmp = arr[k];
-					arr[k] = arr[j];
-					arr[j] = arr[i];
-					arr[i] = tmp;
-					i++;
-					d++;
-				}
-				else
-				{
-					swap(arr, j, k);
-				}
+				swap(arr, k, j);
 				j++;
 			}
 		}
-
-		swap(arr, left, i - 1);
-		swap(arr, right, k + 1);
-
-		if (i - 2 >= 0)
-		{
-			dp_quicksort_select(arr, left, i - 2);
-		}
-		dual_pivot_quicksort(arr, i, k);
-		dual_pivot_quicksort(arr, k + 2, right);
+		k++;
 	}
+	j--;
+	g++;
 
-}
+	swap(arr, low, j);
+	swap(arr, high, g);
+
+	*lp = j;
+
+	return g;
+}	
 
 qs_partition(uint64_t arr[], size_t low, size_t high)
 {
@@ -450,16 +426,20 @@ int main(int argc, char* argv[])
 	// 6 - quicksort
 
 	uint64_t index;
+
+	if (size <= 50) printArray(arr);
 	switch (operation)
 	{
 		case 1:
 			stat = atoi(argv[2]);
 			index = randomized_select(arr, 0, size - 1, stat);
+			if (size <= 50) printf("\n%d\n", arr[index]);
 			break;
 		case 2:
 			stat = atoi(argv[2]);
 			part_size = atoi(argv[3]);
 			index = qselect(arr, 0, size - 1, stat, part_size);
+			if (size <= 50) printf("\n%d\n", arr[index]);
 			break;
 		case 3:
 			quicksort_select(arr, 0, size - 1);
@@ -474,6 +454,7 @@ int main(int argc, char* argv[])
 			quick_sort(arr, 0, size - 1);
 			break;
 	}
+	if (size <=50) printArray(arr);
 
 	printf("%ld;%ld", number_of_comparisons, number_of_swaps);
 	return 0;

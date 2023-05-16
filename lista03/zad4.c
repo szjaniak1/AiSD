@@ -72,7 +72,9 @@ int main(int argc, char* argv[])
 	scanf("%zu", &size);
 	uint32_t *arr = take_input();
 	const size_t index = atoi(argv[1]);
+	
 
+	//print_array(arr);
 	find(arr, arr[index]);
 	return 0;
 }
