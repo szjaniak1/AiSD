@@ -161,3 +161,25 @@ size_t get_size(void)
 {
     return sizeof(Node);
 }
+
+int32_t get_height(const Node *restrict root)
+{
+    if (root == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        int32_t left_height = get_height(root->left);
+        int32_t right_height = get_height(root->right);
+
+        if (left_height >= right_height)
+        {
+            return left_height + 1;
+        }
+        else
+        {
+            return right_height + 1;
+        }
+    }
+}
