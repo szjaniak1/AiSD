@@ -8,17 +8,17 @@ struct Node
     int32_t value;
     int32_t padding;
     Node *right;
-    Node *left;   
+    Node *left;
 };
 
 Node* new_node(const int32_t value)
-{   
+{
     Node* temp = (Node*)malloc(sizeof(Node));
-    
+
     temp->value = value;
     temp->left = NULL;
     temp->right = NULL;
-    printf("kurwa\n");
+
     return temp;
 }
 
@@ -26,8 +26,6 @@ Node* insert(Node *node, const int32_t value)
 {
     if (node == NULL) return new_node(value);
 
-
-    
     if (value < node->value)
     {
         node->left = insert(node->left, value);
@@ -91,8 +89,6 @@ void free_tree(Node *node)
 {
     if (node == NULL) return;
 
-    printf("gowno\n");
-
     free_tree(node->left);
     free_tree(node->right);
 
@@ -103,7 +99,7 @@ void free_tree(Node *node)
 static char *left_trace;
 static char *right_trace;
 
-void print_bst(const Node* restrict root, const size_t depth, const char prefix)
+void print_bst(const Node* restrict root, const int32_t depth, const char prefix)
 {
     if (root == NULL) return;
 
@@ -113,17 +109,17 @@ void print_bst(const Node* restrict root, const size_t depth, const char prefix)
     }
 
     if (prefix == '/') left_trace[depth - 1] = '|';
-    if (prefix == '\\') right_trace[depth - 1]=' ';\
+    if (prefix == '\\') right_trace[depth - 1] = ' ';
 
     if (depth == 0) printf("-");
     if (depth > 0) printf(" ");
 
-    for (size_t i = 0; i < depth - 1; i++)
+    for (int32_t i = 0; i < depth - 1; i++)
     {
-        if (left_trace[i] == '|' || right_trace[i] =='|')
+        if (left_trace[i] == '|' || right_trace[i] == '|')
         {
             printf("| ");
-        } 
+        }
         else
         {
             printf("  ");
@@ -134,21 +130,21 @@ void print_bst(const Node* restrict root, const size_t depth, const char prefix)
 
     printf("[%d]\n", root->value);
 
-    left_trace[depth]=' ';
+    left_trace[depth] = ' ';
 
     if (root->right != NULL)
     {
-        right_trace[depth]='|';
-        print_bst(root->right, depth+1, '\\');
+        right_trace[depth] = '|';
+        print_bst(root->right, depth + 1, '\\');
     }
 }
 
 void init_traces(const size_t size)
 {
-    left_trace = malloc(size * sizeof(char) + 1);
-    right_trace = malloc(size * sizeof(char) + 1);
+    left_trace = malloc(size * sizeof(char));
+    right_trace = malloc(size * sizeof(char));
 
-    for (size_t i = 0; i <= size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         left_trace[i] = ' ';
         right_trace[i] = ' ';
