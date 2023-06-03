@@ -153,7 +153,7 @@ void insertion(register const int32_t data)
     root->color = BLACK;
 }
 
-void deletion(int data)
+void deletion(const register int32_t data)
 {
     RbNode *stack[98], *ptr, *x_ptr, *y_ptr;
     RbNode *p_ptr, *q_ptr, *r_ptr;
@@ -400,7 +400,7 @@ void deletion(int data)
     }
 }
 
-void inorderTraversal(register const RbNode *const restrict node)
+void inorderTraversal(register const RbNode *const node)
 {
     if (node)
     {
