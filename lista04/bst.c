@@ -157,11 +157,6 @@ void free_traces(void)
     free(right_trace);
 }
 
-size_t get_size(void)
-{
-    return sizeof(Node);
-}
-
 int32_t get_height(const Node *restrict root)
 {
     if (root == NULL)
