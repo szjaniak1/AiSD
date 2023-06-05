@@ -24,14 +24,19 @@ Node* new_node(const int32_t value)
 
 Node* insert(Node *node, const int32_t value)
 {
+    SWAPORVIEW++;
     if (node == NULL) return new_node(value);
 
     if (value < node->value)
     {
+        CMPS++;
+        SWAPORVIEW += 2;
         node->left = insert(node->left, value);
     }
     else
     {
+        CMPS += 2;
+        SWAPORVIEW += 2;
         node->right = insert(node->right, value);
     }
 
@@ -39,27 +44,35 @@ Node* insert(Node *node, const int32_t value)
 }
 
 Node *delete(Node *root, const int32_t value)
-{
+{   
+    SWAPORVIEW++;
     if (root == NULL) return root;
 
+    SWAPORVIEW++;
     if (value < root->value)
     {
+        RNS++;   
         root->left = delete(root->left, value);
     }
     else if (value > root->value)
     {
+        CMPS++;
+        RNS++;
         root->right = delete(root->right, value);
     }
     else
     {
+        RNS += 3;
         if (root->left == NULL)
         {
+            RNS++;
             struct Node *temp = root->right;
             free(root);
             return temp;
         }
         else if (root->right == NULL)
         {
+            RNS += 2;
             struct Node *temp = root->left;
             free(root);
             return temp;

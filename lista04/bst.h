@@ -5,6 +5,9 @@
 
 typedef struct Node Node;
 
+int32_t CMPS = 0;
+int32_t SWAPORVIEW = 0;
+
 Node* new_node(const int32_t value);
 Node* insert(Node *node, const int32_t value);
 Node* delete(Node *root, const int32_t value);
